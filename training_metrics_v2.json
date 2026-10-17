@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "architecture": "DualBranch_M15_H4_ResNet",
+  "epochs": 10,
+  "elapsed_seconds": 4313.21,
+  "best_val_f1": 27.0,
+  "final_test_accuracy": 62.15,
+  "trade_precision": 33.33,
+  "model_path": "W:\\data\\trading\\best_order_net_v2.pt"
+}

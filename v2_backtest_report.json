@@ -1,0 +1,42 @@
+[
+  {
+    "Confidence": ">=0.40",
+    "Trades": 2694,
+    "Trades / Day": 12.4,
+    "Win Rate": "20.5%",
+    "Average R:R": "1:4.87",
+    "Profit Factor": 1.12,
+    "Max Drawdown": "83.9%",
+    "Final Balance": "$861,939.81"
+  },
+  {
+    "Confidence": ">=0.45",
+    "Trades": 2694,
+    "Trades / Day": 12.4,
+    "Win Rate": "20.5%",
+    "Average R:R": "1:4.87",
+    "Profit Factor": 1.12,
+    "Max Drawdown": "83.9%",
+    "Final Balance": "$861,939.81"
+  },
+  {
+    "Confidence": ">=0.50",
+    "Trades": 2690,
+    "Trades / Day": 12.3,
+    "Win Rate": "20.5%",
+    "Average R:R": "1:4.87",
+    "Profit Factor": 1.12,
+    "Max Drawdown": "83.8%",
+    "Final Balance": "$847,782.31"
+  },
+  {
+    "Confidence": ">=0.55",
+    "Trades": 1712,
+    "Trades / Day": 7.9,
+    "Win Rate": "19.9%",
+    "Average R:R": "1:4.92",
+    "Profit Factor": 1.15,
+    "Max Drawdown": "77.5%",
+    "Final Balance": "$101,420.78"
+  }
+]
