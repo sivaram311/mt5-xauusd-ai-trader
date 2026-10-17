@@ -1,0 +1,15 @@
+{
+  "test_period": "2025-12-09 04:15:00 to 2026-10-09 11:45:00",
+  "total_evaluated_candles": 19723,
+  "triggered_trades": 6306,
+  "wins": 1612,
+  "losses": 4664,
+  "timed_out": 30,
+  "win_rate_pct": 25.69,
+  "average_rr": 4.22,
+  "initial_balance": 10000.0,
+  "final_balance": 919428268032.0,
+  "net_return_pct": 9194281984.0,
+  "profit_factor": 1.2000000476837158,
+  "max_drawdown_pct": 51.25
+}

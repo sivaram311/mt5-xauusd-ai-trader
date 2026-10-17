@@ -1,0 +1,57 @@
+[
+  {
+    "Setup": "Conf >= 0.60 + Trend Aligned",
+    "trades": 594,
+    "wins": 129,
+    "losses": 465,
+    "win_rate": 21.72,
+    "avg_rr": 4.45,
+    "profit_factor": 1.22,
+    "max_drawdown": 45.39,
+    "final_balance": 25453.73
+  },
+  {
+    "Setup": "Conf >= 0.65 + Trend Aligned",
+    "trades": 435,
+    "wins": 91,
+    "losses": 344,
+    "win_rate": 20.92,
+    "avg_rr": 4.51,
+    "profit_factor": 1.14,
+    "max_drawdown": 41.36,
+    "final_balance": 17605.2
+  },
+  {
+    "Setup": "Conf >= 0.70 + Trend Aligned",
+    "trades": 313,
+    "wins": 56,
+    "losses": 257,
+    "win_rate": 17.89,
+    "avg_rr": 4.54,
+    "profit_factor": 0.97,
+    "max_drawdown": 45.03,
+    "final_balance": 9235.64
+  },
+  {
+    "Setup": "Conf >= 0.60 + Trend Aligned + Liquidity Sweep",
+    "trades": 43,
+    "wins": 4,
+    "losses": 39,
+    "win_rate": 9.3,
+    "avg_rr": 4.64,
+    "profit_factor": 0.46,
+    "max_drawdown": 25.31,
+    "final_balance": 8178.58
+  },
+  {
+    "Setup": "Conf >= 0.65 + Trend Aligned + Liquidity Sweep",
+    "trades": 35,
+    "wins": 1,
+    "losses": 34,
+    "win_rate": 2.86,
+    "avg_rr": 4.63,
+    "profit_factor": 0.14,
+    "max_drawdown": 25.39,
+    "final_balance": 7460.8
+  }
+]
