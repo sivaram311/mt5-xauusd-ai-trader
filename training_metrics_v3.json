@@ -1,0 +1,9 @@
+{
+  "version": "3.0.0",
+  "architecture": "HighAccuracyOrderNetV3_FocalLoss",
+  "epochs": 12,
+  "elapsed_seconds": 3512.94,
+  "best_trade_precision": 13.31,
+  "final_test_accuracy": 84.68,
+  "model_path": "W:\\data\\trading\\best_order_net_v3.pt"
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "Target Top-K": "Top 1 / Day",
+    "Total Trades": 178,
+    "Entries / Day": 0.8,
+    "Win Rate": "31.5%",
+    "Average R:R": "1:3.00",
+    "Profit Factor": 1.36,
+    "Max Drawdown": "12.6%",
+    "Final Balance": "$15,345.03"
+  },
+  {
+    "Target Top-K": "Top 2 / Day",
+    "Total Trades": 356,
+    "Entries / Day": 1.6,
+    "Win Rate": "29.5%",
+    "Average R:R": "1:3.00",
+    "Profit Factor": 1.24,
+    "Max Drawdown": "24.1%",
+    "Final Balance": "$17,996.29"
+  },
+  {
+    "Target Top-K": "Top 3 / Day",
+    "Total Trades": 529,
+    "Entries / Day": 2.4,
+    "Win Rate": "28.7%",
+    "Average R:R": "1:3.00",
+    "Profit Factor": 1.19,
+    "Max Drawdown": "21.9%",
+    "Final Balance": "$20,477.73"
+  },
+  {
+    "Target Top-K": "Top 4 / Day",
+    "Total Trades": 694,
+    "Entries / Day": 3.2,
+    "Win Rate": "28.5%",
+    "Average R:R": "1:3.00",
+    "Profit Factor": 1.19,
+    "Max Drawdown": "22.1%",
+    "Final Balance": "$24,225.90"
+  },
+  {
+    "Target Top-K": "Top 5 / Day",
+    "Total Trades": 853,
+    "Entries / Day": 3.9,
+    "Win Rate": "28.6%",
+    "Average R:R": "1:3.00",
+    "Profit Factor": 1.17,
+    "Max Drawdown": "25.8%",
+    "Final Balance": "$30,436.49"
+  }
+]
