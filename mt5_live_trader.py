@@ -73,7 +73,76 @@ def cancel_existing_ai_pending_orders():
             else:
                 logging.warning(f"Could not cancel order #{o.ticket}: {res.comment}")
 
+def check_spread_safe():
+    tick = mt5.symbol_info_tick(SYMBOL)
+    if not tick:
+        return False, 0.0
+    spread_points = round(abs(tick.ask - tick.bid), 2)
+    # Reject if gold spread expands beyond $0.35 (35 points)
+    is_safe = spread_points <= 0.35
+    return is_safe, spread_points
+
+def manage_active_positions_breakeven():
+    """
+    Scans active positions created by the AI (Magic 778899).
+    If a trade reaches +1.5R in profit, trail Stop Loss to Entry + 0.10 buffer to guarantee risk-free outcome.
+    """
+    positions = mt5.positions_get(symbol=SYMBOL)
+    if not positions:
+        return
+
+    for pos in positions:
+        if pos.magic != MAGIC_NUMBER:
+            continue
+
+        entry_price = pos.price_open
+        current_sl = pos.sl
+        pos_type = pos.type # 0 = BUY, 1 = SELL
+        current_price = pos.price_current
+
+        # Calculate initial risk distance (R)
+        if current_sl == 0.0:
+            continue
+        risk_dist = abs(entry_price - current_sl)
+        if risk_dist <= 0:
+            continue
+
+        # BUY position breakeven trigger at +1.5R
+        if pos_type == mt5.ORDER_TYPE_BUY:
+            profit_dist = current_price - entry_price
+            breakeven_sl = round(entry_price + 0.20, 2) # Entry + $0.20 cushion
+            if profit_dist >= (1.5 * risk_dist) and current_sl < entry_price:
+                req = {
+                    "action": mt5.TRADE_ACTION_SLTP,
+                    "position": pos.ticket,
+                    "sl": breakeven_sl,
+                    "tp": pos.tp
+                }
+                res = mt5.order_send(req)
+                if res.retcode == mt5.TRADE_RETCODE_DONE:
+                    logging.info(f"PROTECTION: Trailed BUY ticket #{pos.ticket} SL to Breakeven (${breakeven_sl}) at +{round(profit_dist/risk_dist, 1)}R")
+
+        # SELL position breakeven trigger at +1.5R
+        elif pos_type == mt5.ORDER_TYPE_SELL:
+            profit_dist = entry_price - current_price
+            breakeven_sl = round(entry_price - 0.20, 2) # Entry - $0.20 cushion
+            if profit_dist >= (1.5 * risk_dist) and (current_sl > entry_price or current_sl == 0.0):
+                req = {
+                    "action": mt5.TRADE_ACTION_SLTP,
+                    "position": pos.ticket,
+                    "sl": breakeven_sl,
+                    "tp": pos.tp
+                }
+                res = mt5.order_send(req)
+                if res.retcode == mt5.TRADE_RETCODE_DONE:
+                    logging.info(f"PROTECTION: Trailed SELL ticket #{pos.ticket} SL to Breakeven (${breakeven_sl}) at +{round(profit_dist/risk_dist, 1)}R")
+
 def place_pending_order(signal):
+    is_safe, spread = check_spread_safe()
+    if not is_safe:
+        logging.warning(f"SPREAD FILTER: Current spread on Gold is ${spread} (> $0.35 limit). Order placement postponed.")
+        return
+
     order_type = signal["order_type"]
     entry = signal["entry"]
     sl = signal["sl"]
@@ -145,6 +214,9 @@ def main():
     
     try:
         while True:
+            # Continually manage trailing breakeven on any open active AI trades
+            manage_active_positions_breakeven()
+
             # Check latest closed candle time
             rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME, 0, 1)
             if rates is not None and len(rates) > 0:
@@ -153,7 +225,7 @@ def main():
                     last_processed_time = current_candle_time
                     run_candle_cycle()
                     
-            # Poll every 10 seconds for new M15 candle close
+            # Poll every 10 seconds for new M15 candle close & position trailing
             time.sleep(10)
     except KeyboardInterrupt:
         logging.info("Trading daemon stopped by user.")
