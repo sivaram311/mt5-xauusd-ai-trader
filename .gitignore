@@ -1,6 +1,6 @@
 # Git ignore for MT5 AI Trader
 # Exclude large data files, runtime logs, and staging caches
-*.npz
+# Exclude large runtime logs and temporary caches
 *.log
 *.zip
 sample_preview.json

@@ -44,7 +44,7 @@ MT5 Execution Bridge (Session 0 Headless Daemon)
 | `build_dataset.py` | Script to pull 99k historical bars from MT5 and generate sliding 100-candle sequences. |
 | `run_full_backtest.py` | Multi-profile backtest engine over 19,723 out-of-sample candles (~10 months). |
 | `optimize_filters.py` | Parameter sweep across confidence levels and session timing windows. |
-| `xauusd_m15_100bars_dataset.npz` | Compressed training dataset (98,853 samples from 2022 to 2026). |
+| `xauusd_m15_100bars_dataset.npz` | Compressed training dataset (98,853 samples from Aug 2022 to Oct 16, 2026). |
 | `backtest_report.json` | Detailed historical trade statistics and equity curve data. |
 | `mt5_live_trader.log` | Operational execution log containing real-time market evaluations. |
 
@@ -58,6 +58,10 @@ MT5 Execution Bridge (Session 0 Headless Daemon)
 - **Win Rate:** `25.7%` to `36.2%` (vs breakeven threshold of `18.5%`)
 - **Profit Factor:** `1.30` to `2.64`
 - **Max Drawdown:** Under `13%` on high-confidence setups
+
+### Release History
+- **v1.1.0 (Oct 18, 2026):** Refreshed dataset to 99,000 M15 bars (up through Oct 16, 2026 23:45 UTC). Retrained V1 Dilated ResNet model reaching 44.26% test trade F1 score and 48.46% trade precision. Tracked all multi-version weights (V1, V2 Dual-Branch, V3 Liquidity Anchor Top-K).
+- **v1.0.0 (Oct 11, 2026):** Initial production release of 1D Temporal ResNet order generation network.
 
 ### Live Forward Testing (Oct 13 – Oct 17, 2026)
 - **Account:** Starting \$718.16 -> Closed at **\$740.47 (+3.11% net gain)**
