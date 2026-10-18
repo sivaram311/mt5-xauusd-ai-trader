@@ -1,0 +1,74 @@
+[
+  {
+    "Profile": "P-V1-LIVE (Conf >= 0.43)",
+    "Total Trades": 3121,
+    "Trades / Day": 14.3,
+    "Win Rate": "26.6%",
+    "Avg Win ($)": "+$14.16",
+    "Avg Loss ($)": "-$3.54",
+    "Profit Factor": 1.45,
+    "Max Drawdown": "28.3%",
+    "Net Profit ($)": "+$3634.58",
+    "Final Balance": "$4352.74"
+  },
+  {
+    "Profile": "P-V1-BALANCED (Conf >= 0.60)",
+    "Total Trades": 799,
+    "Trades / Day": 3.7,
+    "Win Rate": "23.0%",
+    "Avg Win ($)": "+$28.62",
+    "Avg Loss ($)": "-$6.15",
+    "Profit Factor": 1.39,
+    "Max Drawdown": "40.7%",
+    "Net Profit ($)": "+$1486.69",
+    "Final Balance": "$2204.85"
+  },
+  {
+    "Profile": "P-V1-SWING (Conf >= 0.65, Margin >= 0.20)",
+    "Total Trades": 597,
+    "Trades / Day": 2.7,
+    "Win Rate": "22.6%",
+    "Avg Win ($)": "+$32.91",
+    "Avg Loss ($)": "-$6.92",
+    "Profit Factor": 1.39,
+    "Max Drawdown": "42.8%",
+    "Net Profit ($)": "+$1245.13",
+    "Final Balance": "$1963.29"
+  },
+  {
+    "Profile": "P-V3-TOP1 (Top 1 / Day)",
+    "Total Trades": 178,
+    "Trades / Day": 0.8,
+    "Win Rate": "31.5%",
+    "Avg Win ($)": "+$6.03",
+    "Avg Loss ($)": "-$2.05",
+    "Profit Factor": 1.35,
+    "Max Drawdown": "3.5%",
+    "Net Profit ($)": "+$87.64",
+    "Final Balance": "$805.80"
+  },
+  {
+    "Profile": "P-V3-TOP2 (Top 2 / Day)",
+    "Total Trades": 356,
+    "Trades / Day": 1.6,
+    "Win Rate": "29.5%",
+    "Avg Win ($)": "+$6.09",
+    "Avg Loss ($)": "-$2.04",
+    "Profit Factor": 1.25,
+    "Max Drawdown": "6.9%",
+    "Net Profit ($)": "+$126.86",
+    "Final Balance": "$845.02"
+  },
+  {
+    "Profile": "P-V3-TOP3 (Top 3 / Day)",
+    "Total Trades": 529,
+    "Trades / Day": 2.4,
+    "Win Rate": "28.7%",
+    "Avg Win ($)": "+$6.14",
+    "Avg Loss ($)": "-$2.04",
+    "Profit Factor": 1.22,
+    "Max Drawdown": "5.6%",
+    "Net Profit ($)": "+$166.19",
+    "Final Balance": "$884.35"
+  }
+]
