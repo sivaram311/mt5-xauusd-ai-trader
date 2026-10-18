@@ -1,8 +1,8 @@
 {
   "epochs": 12,
-  "elapsed_seconds": 3335.35,
-  "best_val_f1": 46.75,
-  "final_test_accuracy": 40.78,
-  "trade_precision": 48.1,
+  "elapsed_seconds": 2288.18,
+  "best_val_f1": 44.26,
+  "final_test_accuracy": 40.59,
+  "trade_precision": 47.73,
   "model_path": "W:\\data\\trading\\best_order_net.pt"
 }
