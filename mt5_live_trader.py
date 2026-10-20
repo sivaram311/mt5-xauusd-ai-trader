@@ -78,8 +78,8 @@ def check_spread_safe():
     if not tick:
         return False, 0.0
     spread_points = round(abs(tick.ask - tick.bid), 2)
-    # Reject if gold spread expands beyond $0.35 (35 points)
-    is_safe = spread_points <= 0.35
+    # Reject if gold spread expands beyond $0.50 (50 points)
+    is_safe = spread_points <= 0.50
     return is_safe, spread_points
 
 def manage_active_positions_breakeven():
@@ -140,7 +140,7 @@ def manage_active_positions_breakeven():
 def place_pending_order(signal):
     is_safe, spread = check_spread_safe()
     if not is_safe:
-        logging.warning(f"SPREAD FILTER: Current spread on Gold is ${spread} (> $0.35 limit). Order placement postponed.")
+        logging.warning(f"SPREAD FILTER: Current spread on Gold is ${spread} (> $0.50 limit). Order placement postponed.")
         return
 
     order_type = signal["order_type"]
