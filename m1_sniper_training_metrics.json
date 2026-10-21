@@ -1,0 +1,13 @@
+{
+  "epochs": 10,
+  "elapsed_seconds": 6495.07,
+  "best_val_f1": 31.29,
+  "final_test_accuracy": 30.96,
+  "trade_precision": 23.33,
+  "model_path": "W:\\data\\trading\\best_m1_sniper_net.pt",
+  "timeframe": "M1",
+  "lookback": 180,
+  "target_rr": 5.0,
+  "samples": 98776,
+  "spread_modeled": 0.35
+}

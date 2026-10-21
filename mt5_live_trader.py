@@ -1,10 +1,12 @@
 """
-Live Automated Dual-Engine MT5 Trading Daemon for XAUUSD
-Engine 1: M15 Intraday Trend Model (Magic: 778899, Comment: M15_CONF_XX)
-Engine 2: M5 Continuous Scalper Model (Magic: 778855, Comment: M5_SCALP_XX)
-- Polling cycle: Every 5-10 seconds
+Live Automated Triple-Engine MT5 Trading Daemon for XAUUSD
+Engine 1: M15 Intraday Trend Model  (Magic: 778899, Comment: M15_CONF_XX)
+Engine 2: M5 Continuous Scalper     (Magic: 778855, Comment: M5_SCALP_XX)
+Engine 3: M1 Sniper Model (180 bars)(Magic: 778811, Comment: M1_SNIP_XX)
+- Polling cycle: Every 3-5 seconds
+- Multi-pending order support with duplicate tolerance protection ($0.25)
 - Auto-reconnection & IPC health monitoring
-- Isolated order cancellation & independent breakeven trailing per strategy
+- Pure static SL/TP targets (Zero trailing stop interference)
 """
 import time
 import datetime
@@ -12,12 +14,14 @@ import logging
 import MetaTrader5 as mt5
 from predict_order import predict_pending_order_from_100_candles
 from predict_m5_scalp import predict_m5_scalp_order
+from predict_m1_sniper import predict_m1_sniper_order
 
 # Terminal & Symbol settings
 TERMINAL_PATH = r"E:\ProgramFiles\MT5\terminal64.exe"
 SYMBOL = "XAUUSD"
 TIMEFRAME_M15 = mt5.TIMEFRAME_M15
 TIMEFRAME_M5 = mt5.TIMEFRAME_M5
+TIMEFRAME_M1 = mt5.TIMEFRAME_M1
 
 # Strategy 1: M15 Intraday Settings
 M15_MAGIC = 778899
@@ -27,9 +31,15 @@ M15_RISK_PCT = 1.0
 
 # Strategy 2: M5 Scalper Settings
 M5_MAGIC = 778855
-M5_CONF_GATE = 0.50          # Balanced scalper gate (43.4% win rate, 1.48 PF in forward backtest)
+M5_CONF_GATE = 0.50          # Balanced scalper gate
 M5_EXPIRY_MINUTES = 90       # 18 bars (90 mins max duration)
-M5_RISK_PCT = 0.5            # 0.5% risk per scalp trade to preserve capital with higher frequency
+M5_RISK_PCT = 0.5            # 0.5% risk per scalp trade
+
+# Strategy 3: M1 Sniper Settings (>= 1:5 RR, 180 bars lookback)
+M1_MAGIC = 778811
+M1_CONF_GATE = 0.45          # Sniper confidence gate
+M1_EXPIRY_MINUTES = 25       # Auto-timeout cancellation (25 mins max pending lifespan)
+M1_RISK_PCT = 0.35           # 0.35% risk per sniper trade (tight risk for high asymmetric payoff)
 
 # Execution safeguards
 SLIPPAGE_TOLERANCE = 10      # in points
@@ -101,10 +111,6 @@ def cancel_pending_orders_by_magic(magic_number, strategy_tag):
                 logging.warning(f"[{strategy_tag}] Could not cancel order #{o.ticket}: {res.comment}")
 
 def has_duplicate_pending_order(magic_number, entry_price, tolerance=0.25):
-    """
-    Checks if a pending order already exists within +/- tolerance ($0.25)
-    to prevent spamming identical entries at the exact same price.
-    """
     orders = mt5.orders_get(symbol=SYMBOL)
     if not orders:
         return False
@@ -132,7 +138,7 @@ def run_m15_cycle():
             return
 
         if has_duplicate_pending_order(M15_MAGIC, signal["entry"]):
-            logging.info(f"[M15] Pending order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
+            logging.info(f"[M15] Order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
             return
 
         balance = get_account_balance()
@@ -208,13 +214,61 @@ def run_m5_cycle():
         else:
             logging.error(f"[M5] Failed scalp order: {res.retcode} ({res.comment})")
 
+# --- M1 Sniper Cycle (180 Bars Context, >= 1:5 RR, 25-Min Auto-Timeout) ---
+def run_m1_cycle():
+    rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME_M1, 0, 180)
+    if rates is None or len(rates) != 180:
+        return
+
+    candles = [{"open": float(r['open']), "high": float(r['high']), "low": float(r['low']), "close": float(r['close'])} for r in rates]
+    signal = predict_m1_sniper_order(candles)
+    bar_time = datetime.datetime.fromtimestamp(rates[-1]['time'], datetime.timezone.utc).strftime('%H:%M:%S UTC')
+    logging.info(f"[M1_SNIPER] Candle {bar_time} | Signal: {signal['order_type']} | Conf: {signal.get('confidence', 0)} | RR: {signal.get('rr', 'N/A')}")
+
+    if signal["order_type"] in ["BUY_LIMIT", "SELL_LIMIT"] and signal.get("confidence", 0) >= M1_CONF_GATE:
+        is_safe, spread = check_spread_safe()
+        if not is_safe:
+            logging.warning(f"[M1] Spread ${spread} exceeds limit. Skipping sniper order.")
+            return
+
+        if has_duplicate_pending_order(M1_MAGIC, signal["entry"]):
+            logging.info(f"[M1] Sniper order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
+            return
+
+        balance = get_account_balance()
+        lot = calculate_lot(balance, M1_RISK_PCT, signal["risk_pts"])
+        order_type = mt5.ORDER_TYPE_BUY_LIMIT if signal["order_type"] == "BUY_LIMIT" else mt5.ORDER_TYPE_SELL_LIMIT
+        expiration = get_broker_time() + (M1_EXPIRY_MINUTES * 60) # 25-min auto-timeout cancellation
+        comment_str = f"M1_SNIP_{int(signal['confidence']*100)}"
+
+        req = {
+            "action": mt5.TRADE_ACTION_PENDING,
+            "symbol": SYMBOL,
+            "volume": lot,
+            "type": order_type,
+            "price": signal["entry"],
+            "sl": signal["sl"],
+            "tp": signal["tp"],
+            "deviation": SLIPPAGE_TOLERANCE,
+            "magic": M1_MAGIC,
+            "comment": comment_str,
+            "type_time": mt5.ORDER_TIME_SPECIFIED,
+            "expiration": expiration
+        }
+        res = mt5.order_send(req)
+        if res.retcode == mt5.TRADE_RETCODE_DONE:
+            logging.info(f"[M1] SUCCESS: Placed {signal['order_type']} #{res.order} | Lot: {lot} | Entry: {signal['entry']} | SL: {signal['sl']} | TP: {signal['tp']} | RR: {signal['rr']} | Comment: {comment_str}")
+        else:
+            logging.error(f"[M1] Failed sniper order: {res.retcode} ({res.comment})")
+
 def main():
-    logging.info("Starting Dual-Engine MT5 Trading Daemon (M15 Intraday + M5 Scalper)...")
+    logging.info("Starting Triple-Engine MT5 Trading Daemon (M15 Intraday + M5 Scalper + M1 Sniper)...")
     if not connect_mt5():
         return
 
     last_m15_time = None
     last_m5_time = None
+    last_m1_time = None
 
     try:
         while True:
@@ -236,7 +290,15 @@ def main():
                     last_m5_time = t5
                     run_m5_cycle()
 
-            time.sleep(5)
+            # Check M1 bar update
+            r_m1 = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME_M1, 0, 1)
+            if r_m1 is not None and len(r_m1) > 0:
+                t1 = r_m1[0]['time']
+                if t1 != last_m1_time:
+                    last_m1_time = t1
+                    run_m1_cycle()
+
+            time.sleep(3)
     except KeyboardInterrupt:
         logging.info("Daemon stopped by user.")
     finally:
