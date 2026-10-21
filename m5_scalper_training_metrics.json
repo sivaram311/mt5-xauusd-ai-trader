@@ -1,0 +1,11 @@
+{
+  "epochs": 10,
+  "elapsed_seconds": 1323.58,
+  "best_val_f1": 55.41,
+  "final_test_accuracy": 50.5,
+  "trade_precision": 51.8,
+  "model_path": "W:\\data\\trading\\best_m5_scalper_net.pt",
+  "timeframe": "M5",
+  "samples": 98923,
+  "spread_modeled": 0.35
+}

@@ -1,0 +1,38 @@
+{
+  "conf_45": {
+    "confidence_threshold": 0.45,
+    "total_trades": 5837,
+    "win_rate": 42.21,
+    "profit_factor": 1.4199999570846558,
+    "final_balance": 866766.8125,
+    "net_return_pct": 8567.669921875,
+    "max_drawdown": 30.65999984741211
+  },
+  "conf_50": {
+    "confidence_threshold": 0.5,
+    "total_trades": 4673,
+    "win_rate": 43.4,
+    "profit_factor": 1.4800000190734863,
+    "final_balance": 794748.75,
+    "net_return_pct": 7847.490234375,
+    "max_drawdown": 26.219999313354492
+  },
+  "conf_55": {
+    "confidence_threshold": 0.55,
+    "total_trades": 3292,
+    "win_rate": 45.32,
+    "profit_factor": 1.590000033378601,
+    "final_balance": 679265.1875,
+    "net_return_pct": 6692.64990234375,
+    "max_drawdown": 30.329999923706055
+  },
+  "conf_60": {
+    "confidence_threshold": 0.6,
+    "total_trades": 2030,
+    "win_rate": 48.18,
+    "profit_factor": 1.809999942779541,
+    "final_balance": 514367.5625,
+    "net_return_pct": 5043.68017578125,
+    "max_drawdown": 34.560001373291016
+  }
+}
