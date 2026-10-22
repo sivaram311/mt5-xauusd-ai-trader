@@ -1,0 +1,82 @@
+{
+  "total_samples": 84810,
+  "positive_setups": 15118,
+  "positive_pct": 17.83,
+  "samples_preview": [
+    {
+      "bar_idx": 126,
+      "current_close": 4025.93994140625,
+      "trade": {
+        "confirm": 1,
+        "direction": 1,
+        "entry": 4025.97,
+        "sl": 4027.97,
+        "tp": 4015.62,
+        "time_to_fill": 1.0,
+        "risk": 2.0,
+        "reward": 10.35,
+        "rr": 5.17
+      }
+    },
+    {
+      "bar_idx": 135,
+      "current_close": 4022.530029296875,
+      "trade": {
+        "confirm": 1,
+        "direction": 1,
+        "entry": 4023.2,
+        "sl": 4025.2,
+        "tp": 4012.85,
+        "time_to_fill": 1.0,
+        "risk": 2.0,
+        "reward": 10.35,
+        "rr": 5.17
+      }
+    },
+    {
+      "bar_idx": 136,
+      "current_close": 4023.679931640625,
+      "trade": {
+        "confirm": 1,
+        "direction": 1,
+        "entry": 4023.74,
+        "sl": 4025.74,
+        "tp": 4013.39,
+        "time_to_fill": 1.0,
+        "risk": 2.0,
+        "reward": 10.35,
+        "rr": 5.17
+      }
+    },
+    {
+      "bar_idx": 154,
+      "current_close": 4013.830078125,
+      "trade": {
+        "confirm": 1,
+        "direction": 0,
+        "entry": 4012.92,
+        "sl": 4010.92,
+        "tp": 4023.27,
+        "time_to_fill": 1.0,
+        "risk": 2.0,
+        "reward": 10.35,
+        "rr": 5.17
+      }
+    },
+    {
+      "bar_idx": 155,
+      "current_close": 4012.830078125,
+      "trade": {
+        "confirm": 1,
+        "direction": 0,
+        "entry": 4012.51,
+        "sl": 4010.51,
+        "tp": 4022.86,
+        "time_to_fill": 1.0,
+        "risk": 2.0,
+        "reward": 10.35,
+        "rr": 5.17
+      }
+    }
+  ]
+}
