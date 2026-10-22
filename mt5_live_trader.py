@@ -29,19 +29,19 @@ TIMEFRAME_M1 = mt5.TIMEFRAME_M1
 
 # Strategy 1: M15 Intraday Settings
 M15_MAGIC = 778899
-M15_CONF_GATE = 0.43
+M15_CONF_GATE = 0.299         # Threshold: 29.9% or above
 M15_EXPIRY_HOURS = 12
 M15_RISK_PCT = 1.0
 
 # Strategy 2: M5 Scalper Settings
 M5_MAGIC = 778855
-M5_CONF_GATE = 0.50          # Balanced scalper gate
+M5_CONF_GATE = 0.299          # Threshold: 29.9% or above
 M5_EXPIRY_MINUTES = 90       # 18 bars (90 mins max duration)
 M5_RISK_PCT = 0.5            # 0.5% risk per scalp trade
 
 # Strategy 3: M1 Directional & RL Sniper V3 Settings
 M1_MAGIC = 778811
-M1_CONF_GATE = 0.55          # Sniper confidence gate (targeted frequency: ~1 trade / 30 mins)
+M1_CONF_GATE = 0.299          # Threshold: 29.9% or above
 M1_EXPIRY_MINUTES = 25       # Auto-timeout cancellation (25 mins max pending lifespan)
 M1_RISK_PCT = 0.35           # 0.35% risk per sniper trade
 
