@@ -1,0 +1,10 @@
+{
+  "epochs": 10,
+  "elapsed_seconds": 4091.68,
+  "best_val_f1": 23.08,
+  "final_test_accuracy": 38.1,
+  "trade_precision": 13.72,
+  "trade_recall": 72.71,
+  "model_path": "W:\\data\\trading\\best_m1_v3_rl_directional_net.pt",
+  "loss_type": "Focal Loss + H4 Trend Gating"
+}

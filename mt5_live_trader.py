@@ -2,20 +2,23 @@
 Live Automated Triple-Engine MT5 Trading Daemon for XAUUSD
 Engine 1: M15 Intraday Trend Model  (Magic: 778899, Comment: M15_CONF_XX)
 Engine 2: M5 Continuous Scalper     (Magic: 778855, Comment: M5_SCALP_XX)
-Engine 3: M1 Dual-Branch Hierarchical Sniper V2 (Magic: 778811, Comment: M1_V2_XX)
+Engine 3: M1 Directional & RL Sniper V3 (Magic: 778811, Comment: M1_V3_XX)
 - Polling cycle: Every 3-5 seconds
 - Multi-pending order support with duplicate tolerance protection ($0.25)
 - Auto-reconnection & IPC health monitoring
 - Pure static SL/TP targets (Zero trailing stop interference)
 - 25-minute auto-timeout cancellation on M1 Sniper orders
+- Hard Directional Guardrails: Blocks BUY during steep H4 downtrend (slope < -0.5)
 """
 import time
 import datetime
 import logging
 import MetaTrader5 as mt5
+import numpy as np
+import pandas as pd
 from predict_order import predict_pending_order_from_100_candles
 from predict_m5_scalp import predict_m5_scalp_order
-from predict_m1_v2_hierarchical import predict_m1_v2_sniper_order
+from predict_m1_v3_directional import predict_m1_v3_directional_order
 
 # Terminal & Symbol settings
 TERMINAL_PATH = r"E:\ProgramFiles\MT5\terminal64.exe"
@@ -36,9 +39,9 @@ M5_CONF_GATE = 0.50          # Balanced scalper gate
 M5_EXPIRY_MINUTES = 90       # 18 bars (90 mins max duration)
 M5_RISK_PCT = 0.5            # 0.5% risk per scalp trade
 
-# Strategy 3: M1 Hierarchical Sniper V2 Settings (Dual-Branch 2-Week to M1 Stack)
+# Strategy 3: M1 Directional & RL Sniper V3 Settings
 M1_MAGIC = 778811
-M1_CONF_GATE = 0.45          # Sniper confidence gate
+M1_CONF_GATE = 0.55          # Sniper confidence gate (targeted frequency: ~1 trade / 30 mins)
 M1_EXPIRY_MINUTES = 25       # Auto-timeout cancellation (25 mins max pending lifespan)
 M1_RISK_PCT = 0.35           # 0.35% risk per sniper trade
 
@@ -123,15 +126,24 @@ def has_duplicate_pending_order(magic_number, entry_price, tolerance=0.25):
 
 def get_macro_levels():
     r15 = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_M15, 0, 1)
-    rh4 = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_H4, 0, 1)
+    rh4 = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_H4, 0, 50)
     rd1 = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_D1, 0, 1)
     rw1 = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_W1, 0, 2)
     
-    if r15 is None or rh4 is None or rd1 is None or rw1 is None or len(rw1) < 2:
+    if r15 is None or rh4 is None or rd1 is None or rw1 is None or len(rw1) < 2 or len(rh4) < 20:
         return None
 
     now_utc = datetime.datetime.now(datetime.timezone.utc)
     time_of_day = (now_utc.hour * 3600 + now_utc.minute * 60 + now_utc.second) / 86400.0
+
+    # Calculate 20-period H4 Trend Slope and ATR normalizer
+    h4_closes = pd.Series([r['close'] for r in rh4])
+    h4_highs = pd.Series([r['high'] for r in rh4])
+    h4_lows = pd.Series([r['low'] for r in rh4])
+    h4_ema20 = h4_closes.ewm(span=20, adjust=False).mean()
+    h4_tr = np.maximum(h4_highs - h4_lows, np.abs(h4_highs - h4_closes.shift(1).fillna(h4_closes.iloc[0])))
+    h4_atr = h4_tr.rolling(20).mean().bfill()
+    h4_slope = float((h4_closes.iloc[-1] - h4_ema20.iloc[-1]) / (h4_atr.iloc[-1] + 1e-4))
 
     return {
         'w2_high': float(max(rw1[0]['high'], rw1[1]['high'])),
@@ -140,10 +152,11 @@ def get_macro_levels():
         'w1_low': float(rw1[1]['low']),
         'd1_high': float(rd1[0]['high']),
         'd1_low': float(rd1[0]['low']),
-        'h4_high': float(rh4[0]['high']),
-        'h4_low': float(rh4[0]['low']),
+        'h4_high': float(rh4[-1]['high']),
+        'h4_low': float(rh4[-1]['low']),
         'm15_high': float(r15[0]['high']),
         'm15_low': float(r15[0]['low']),
+        'h4_slope': h4_slope,
         'time_of_day': time_of_day
     }
 
@@ -241,7 +254,7 @@ def run_m5_cycle():
         else:
             logging.error(f"[M5] Failed scalp order: {res.retcode} ({res.comment})")
 
-# --- M1 Hierarchical Sniper V2 Cycle (180 Bars + 2-Week to M1 Stack) ---
+# --- M1 Directional Sniper V3 Cycle (180 Bars + RL Direction Awareness) ---
 def run_m1_cycle():
     rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME_M1, 0, 180)
     if rates is None or len(rates) != 180:
@@ -252,25 +265,25 @@ def run_m1_cycle():
         return
 
     candles = [{"open": float(r['open']), "high": float(r['high']), "low": float(r['low']), "close": float(r['close'])} for r in rates]
-    signal = predict_m1_v2_sniper_order(candles, macro_levels)
+    signal = predict_m1_v3_directional_order(candles, macro_levels)
     bar_time = datetime.datetime.fromtimestamp(rates[-1]['time'], datetime.timezone.utc).strftime('%H:%M:%S UTC')
-    logging.info(f"[M1_V2_SNIPER] Candle {bar_time} | Signal: {signal['order_type']} | Conf: {signal.get('confidence', 0)} | RR: {signal.get('rr', 'N/A')}")
+    logging.info(f"[M1_V3_SNIPER] Candle {bar_time} | Signal: {signal['order_type']} | Conf: {signal.get('confidence', 0)} | H4_Slope: {signal.get('h4_slope', 'N/A')} | RR: {signal.get('rr', 'N/A')}")
 
     if signal["order_type"] in ["BUY_LIMIT", "SELL_LIMIT"] and signal.get("confidence", 0) >= M1_CONF_GATE:
         is_safe, spread = check_spread_safe()
         if not is_safe:
-            logging.warning(f"[M1_V2] Spread ${spread} exceeds limit. Skipping sniper order.")
+            logging.warning(f"[M1_V3] Spread ${spread} exceeds limit. Skipping sniper order.")
             return
 
         if has_duplicate_pending_order(M1_MAGIC, signal["entry"]):
-            logging.info(f"[M1_V2] Sniper order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
+            logging.info(f"[M1_V3] Sniper order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
             return
 
         balance = get_account_balance()
         lot = calculate_lot(balance, M1_RISK_PCT, signal["risk_pts"])
         order_type = mt5.ORDER_TYPE_BUY_LIMIT if signal["order_type"] == "BUY_LIMIT" else mt5.ORDER_TYPE_SELL_LIMIT
         expiration = get_broker_time() + (M1_EXPIRY_MINUTES * 60) # 25-minute auto-timeout
-        comment_str = f"M1_V2_{int(signal['confidence']*100)}"
+        comment_str = f"M1_V3_{int(signal['confidence']*100)}"
 
         req = {
             "action": mt5.TRADE_ACTION_PENDING,
@@ -288,12 +301,12 @@ def run_m1_cycle():
         }
         res = mt5.order_send(req)
         if res.retcode == mt5.TRADE_RETCODE_DONE:
-            logging.info(f"[M1_V2] SUCCESS: Placed {signal['order_type']} #{res.order} | Lot: {lot} | Entry: {signal['entry']} | SL: {signal['sl']} | TP: {signal['tp']} | RR: {signal['rr']} | Comment: {comment_str}")
+            logging.info(f"[M1_V3] SUCCESS: Placed {signal['order_type']} #{res.order} | Lot: {lot} | Entry: {signal['entry']} | SL: {signal['sl']} | TP: {signal['tp']} | RR: {signal['rr']} | Comment: {comment_str}")
         else:
-            logging.error(f"[M1_V2] Failed sniper order: {res.retcode} ({res.comment})")
+            logging.error(f"[M1_V3] Failed sniper order: {res.retcode} ({res.comment})")
 
 def main():
-    logging.info("Starting Triple-Engine MT5 Trading Daemon (M15 Intraday + M5 Scalper + M1 Sniper V2)...")
+    logging.info("Starting Triple-Engine MT5 Trading Daemon (M15 Intraday + M5 Scalper + M1 Sniper V3 RL)...")
     if not connect_mt5():
         return
 
