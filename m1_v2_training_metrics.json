@@ -1,0 +1,11 @@
+{
+  "epochs": 10,
+  "elapsed_seconds": 6347.05,
+  "best_val_f1": 35.1,
+  "final_test_accuracy": 35.02,
+  "trade_precision": 23.68,
+  "model_path": "W:\\data\\trading\\best_m1_v2_hierarchical_net.pt",
+  "architecture": "Dual-Branch Hierarchical M1 ResNet + Macro MLP",
+  "samples": 84555,
+  "spread_modeled": 0.35
+}

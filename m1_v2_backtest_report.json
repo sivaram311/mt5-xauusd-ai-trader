@@ -1,0 +1,38 @@
+{
+  "conf_40": {
+    "confidence_gate": 0.4,
+    "total_trades": 43,
+    "mins_per_trade": 391.8,
+    "win_rate": 30.23,
+    "profit_factor": 1.149999976158142,
+    "net_return_pct": 2.1700000762939453,
+    "max_drawdown": 8.890000343322754
+  },
+  "conf_45": {
+    "confidence_gate": 0.45,
+    "total_trades": 43,
+    "mins_per_trade": 391.8,
+    "win_rate": 30.23,
+    "profit_factor": 1.149999976158142,
+    "net_return_pct": 2.1700000762939453,
+    "max_drawdown": 8.890000343322754
+  },
+  "conf_50": {
+    "confidence_gate": 0.5,
+    "total_trades": 41,
+    "mins_per_trade": 410.9,
+    "win_rate": 31.71,
+    "profit_factor": 1.2300000190734863,
+    "net_return_pct": 3.119999885559082,
+    "max_drawdown": 8.460000038146973
+  },
+  "conf_55": {
+    "confidence_gate": 0.55,
+    "total_trades": 32,
+    "mins_per_trade": 526.5,
+    "win_rate": 34.38,
+    "profit_factor": 1.409999966621399,
+    "net_return_pct": 4.150000095367432,
+    "max_drawdown": 7.0
+  }
+}
