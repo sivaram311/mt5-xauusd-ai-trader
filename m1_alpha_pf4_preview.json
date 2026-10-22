@@ -1,0 +1,71 @@
+{
+  "total_samples": 84840,
+  "positive_top1_trades": 33,
+  "samples_preview": [
+    {
+      "date": "2026-08-03",
+      "time_utc": "15:01",
+      "ref_close": 4061.699951171875,
+      "setup": {
+        "direction": 1,
+        "entry": 4062.02,
+        "sl": 4066.929931640625,
+        "tp": 4051.67,
+        "time_to_fill": 1.0,
+        "fill_step_idx": 4818
+      }
+    },
+    {
+      "date": "2026-08-05",
+      "time_utc": "13:33",
+      "ref_close": 4157.4501953125,
+      "setup": {
+        "direction": 0,
+        "entry": 4155.26,
+        "sl": 4152.58984375,
+        "tp": 4165.61,
+        "time_to_fill": 1.0,
+        "fill_step_idx": 7490
+      }
+    },
+    {
+      "date": "2026-08-07",
+      "time_utc": "12:30",
+      "ref_close": 4304.330078125,
+      "setup": {
+        "direction": 0,
+        "entry": 4304.49,
+        "sl": 4300.58984375,
+        "tp": 4314.84,
+        "time_to_fill": 1.0,
+        "fill_step_idx": 10187
+      }
+    },
+    {
+      "date": "2026-08-13",
+      "time_utc": "16:39",
+      "ref_close": 4382.31005859375,
+      "setup": {
+        "direction": 1,
+        "entry": 4382.2,
+        "sl": 4385.06005859375,
+        "tp": 4371.85,
+        "time_to_fill": 1.0,
+        "fill_step_idx": 15956
+      }
+    },
+    {
+      "date": "2026-08-17",
+      "time_utc": "13:26",
+      "ref_close": 4393.2099609375,
+      "setup": {
+        "direction": 0,
+        "entry": 4393.35,
+        "sl": 4386.6298828125,
+        "tp": 4403.7,
+        "time_to_fill": 1.0,
+        "fill_step_idx": 18523
+      }
+    }
+  ]
+}
