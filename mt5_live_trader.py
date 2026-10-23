@@ -29,19 +29,19 @@ TIMEFRAME_M1 = mt5.TIMEFRAME_M1
 
 # Strategy 1: M15 Intraday Settings
 M15_MAGIC = 778899
-M15_CONF_GATE = 0.43          # Restored balanced M15 gate
+M15_CONF_GATE = 0.50          # Calibrated to winning cluster (mean winner 48-51%)
 M15_EXPIRY_HOURS = 12
 M15_RISK_PCT = 1.0
 
 # Strategy 2: M5 High-Win-Rate Liquidity Engine (1:2.6 R:R, PF 2.36)
 M5_MAGIC = 778855
-M5_CONF_GATE = 0.55           # High-Conviction M5 Gate (42% to 48% Win Rate)
+M5_CONF_GATE = 0.58           # Calibrated to peak winning zone (mean winner 55-58%, cuts 60% of losses)
 M5_EXPIRY_MINUTES = 30        # 6 bars (30 mins auto-expiry)
 M5_RISK_PCT = 0.75            # 0.75% risk per trade
 
 # Strategy 3: M1 Directional & RL Sniper V3 Settings
 M1_MAGIC = 778811
-M1_CONF_GATE = 0.55           # High selectivity sniper gate
+M1_CONF_GATE = 0.60           # Calibrated to high conviction zone (mean winner 57-58.5%)
 M1_EXPIRY_MINUTES = 25        # Auto-timeout cancellation
 M1_RISK_PCT = 0.35            # 0.35% risk per sniper trade
 
