@@ -17,7 +17,7 @@ import MetaTrader5 as mt5
 import numpy as np
 import pandas as pd
 from predict_order import predict_pending_order_from_100_candles
-from predict_m5_scalp import predict_m5_scalp_order
+from predict_m5_hwr import predict_m5_hwr_order
 from predict_m1_v3_directional import predict_m1_v3_directional_order
 
 # Terminal & Symbol settings
@@ -29,21 +29,21 @@ TIMEFRAME_M1 = mt5.TIMEFRAME_M1
 
 # Strategy 1: M15 Intraday Settings
 M15_MAGIC = 778899
-M15_CONF_GATE = 0.299         # Threshold: 29.9% or above
+M15_CONF_GATE = 0.43          # Restored balanced M15 gate
 M15_EXPIRY_HOURS = 12
 M15_RISK_PCT = 1.0
 
-# Strategy 2: M5 Scalper Settings
+# Strategy 2: M5 High-Win-Rate Liquidity Engine (1:2.6 R:R, PF 2.36)
 M5_MAGIC = 778855
-M5_CONF_GATE = 0.299          # Threshold: 29.9% or above
-M5_EXPIRY_MINUTES = 90       # 18 bars (90 mins max duration)
-M5_RISK_PCT = 0.5            # 0.5% risk per scalp trade
+M5_CONF_GATE = 0.55           # High-Conviction M5 Gate (42% to 48% Win Rate)
+M5_EXPIRY_MINUTES = 30        # 6 bars (30 mins auto-expiry)
+M5_RISK_PCT = 0.75            # 0.75% risk per trade
 
 # Strategy 3: M1 Directional & RL Sniper V3 Settings
 M1_MAGIC = 778811
-M1_CONF_GATE = 0.299          # Threshold: 29.9% or above
-M1_EXPIRY_MINUTES = 25       # Auto-timeout cancellation (25 mins max pending lifespan)
-M1_RISK_PCT = 0.35           # 0.35% risk per sniper trade
+M1_CONF_GATE = 0.55           # High selectivity sniper gate
+M1_EXPIRY_MINUTES = 25        # Auto-timeout cancellation
+M1_RISK_PCT = 0.35            # 0.35% risk per sniper trade
 
 # Execution safeguards
 SLIPPAGE_TOLERANCE = 10      # in points
@@ -207,32 +207,37 @@ def run_m15_cycle():
         else:
             logging.error(f"[M15] Failed order: {res.retcode} ({res.comment})")
 
-# --- M5 Scalper Cycle ---
+# --- M5 High-Win-Rate Liquidity Engine (48 Bars + 1:2.6 R:R) ---
 def run_m5_cycle():
-    rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME_M5, 0, 60)
-    if rates is None or len(rates) != 60:
+    rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME_M5, 0, 48)
+    if rates is None or len(rates) != 48:
         return
 
-    candles = [{"open": float(r['open']), "high": float(r['high']), "low": float(r['low']), "close": float(r['close'])} for r in rates]
-    signal = predict_m5_scalp_order(candles)
+    macro_levels = get_macro_levels()
+    if macro_levels is None:
+        return
+
+    candles = [{"open": float(r['open']), "high": float(r['high']), "low": float(r['low']), "close": float(r['close']), "time": int(r['time'])} for r in rates]
+    signal = predict_m5_hwr_order(candles, macro_levels)
     bar_time = datetime.datetime.fromtimestamp(rates[-1]['time'], datetime.timezone.utc).strftime('%H:%M:%S UTC')
-    logging.info(f"[M5_SCALP] Candle {bar_time} | Signal: {signal['order_type']} | Conf: {signal.get('confidence', 0)}")
+    logging.info(f"[M5_HWR] Candle {bar_time} | Signal: {signal['order_type']} | Conf: {signal.get('confidence', 0)} | RR: {signal.get('rr', 'N/A')}")
 
     if signal["order_type"] in ["BUY_LIMIT", "SELL_LIMIT"] and signal.get("confidence", 0) >= M5_CONF_GATE:
         is_safe, spread = check_spread_safe()
         if not is_safe:
-            logging.warning(f"[M5] Spread ${spread} exceeds limit. Skipping scalp order.")
+            logging.warning(f"[M5_HWR] Spread ${spread} exceeds limit. Skipping order.")
             return
 
         if has_duplicate_pending_order(M5_MAGIC, signal["entry"]):
-            logging.info(f"[M5] Scalp order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
+            logging.info(f"[M5_HWR] Order already active at ${signal['entry']} (tolerance $0.25). Skipping duplicate.")
             return
 
         balance = get_account_balance()
         lot = calculate_lot(balance, M5_RISK_PCT, signal["risk_pts"])
         order_type = mt5.ORDER_TYPE_BUY_LIMIT if signal["order_type"] == "BUY_LIMIT" else mt5.ORDER_TYPE_SELL_LIMIT
-        expiration = get_broker_time() + (M5_EXPIRY_MINUTES * 60)
-        comment_str = f"M5_SCALP_{int(signal['confidence']*100)}"
+        timeout_mins = signal.get("time_to_fill_mins", M5_EXPIRY_MINUTES)
+        expiration = get_broker_time() + (timeout_mins * 60)
+        comment_str = f"M5_HWR_{int(signal['confidence']*100)}"
 
         req = {
             "action": mt5.TRADE_ACTION_PENDING,
@@ -250,9 +255,9 @@ def run_m5_cycle():
         }
         res = mt5.order_send(req)
         if res.retcode == mt5.TRADE_RETCODE_DONE:
-            logging.info(f"[M5] SUCCESS: Placed {signal['order_type']} #{res.order} | Lot: {lot} | Entry: {signal['entry']} | SL: {signal['sl']} | TP: {signal['tp']} | Comment: {comment_str}")
+            logging.info(f"[M5_HWR] SUCCESS: Placed {signal['order_type']} #{res.order} | Lot: {lot} | Entry: {signal['entry']} | SL: {signal['sl']} | TP: {signal['tp']} | RR: {signal['rr']} | Comment: {comment_str}")
         else:
-            logging.error(f"[M5] Failed scalp order: {res.retcode} ({res.comment})")
+            logging.error(f"[M5_HWR] Failed order: {res.retcode} ({res.comment})")
 
 # --- M1 Directional Sniper V3 Cycle (180 Bars + RL Direction Awareness) ---
 def run_m1_cycle():
