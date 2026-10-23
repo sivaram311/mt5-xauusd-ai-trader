@@ -37,14 +37,16 @@ MT5 Execution Bridge (Session 0 Headless Daemon)
 
 | File | Description |
 | :--- | :--- |
+| `best_m5_hwr_net.pt` | M5 High-Win-Rate Liquidity Engine (1:2.6 R:R, PF 2.36 at 48% WR). |
+| `best_m1_v3_rl_directional_net.pt` | M1 V3 Direction-Aware & Reinforcement Sniper with H4 slope gating. |
 | `best_order_net.pt` | Trained PyTorch weights (~695 KB) trained on 99,000 M15 bars (4+ years of XAUUSD history). |
-| `predict_order.py` | Core inference engine (< 2 ms latency on CPU) returning JSON execution signals. |
-| `mt5_live_trader.py` | Production daemon that connects to MT5 terminal and manages orders on every M15 close. |
-| `train_model.py` | Training script using multi-task masked loss (Cross-Entropy + Smooth L1). |
-| `build_dataset.py` | Script to pull 99k historical bars from MT5 and generate sliding 100-candle sequences. |
-| `run_full_backtest.py` | Multi-profile backtest engine over 19,723 out-of-sample candles (~10 months). |
-| `optimize_filters.py` | Parameter sweep across confidence levels and session timing windows. |
-| `xauusd_m15_100bars_dataset.npz` | Compressed training dataset (98,853 samples from Aug 2022 to Oct 16, 2026). |
+| `predict_m5_hwr.py` | Inference engine for M5 HWR model. |
+| `predict_m1_v3_directional.py` | Inference engine for M1 V3 Direction-Aware Sniper. |
+| `predict_order.py` | Core M15 inference engine returning JSON execution signals. |
+| `mt5_live_trader.py` | Production daemon running triple-engine execution (M15 + M5 + M1) on Session 0. |
+| `build_m5_hwr_dataset.py` | Dataset generator for M5 High-Win-Rate asymmetric trades. |
+| `train_m5_hwr.py` | Training script for M5 HWR network. |
+| `backtest_m5_hwr.py` | Forward backtest engine for M5 HWR model. |
 | `backtest_report.json` | Detailed historical trade statistics and equity curve data. |
 | `mt5_live_trader.log` | Operational execution log containing real-time market evaluations. |
 

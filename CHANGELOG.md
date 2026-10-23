@@ -4,6 +4,39 @@ All notable changes, architectural iterations, model versions, and live executio
 
 ---
 
+## [v2.4.0] - 2026-10-23: Statistical Win-Rate Recalibration & Directional Safeguards
+
+### 1. Empirical Winning Distribution & Confidence Gate Recalibration
+- **Data Audit**: Audited 501 historical exit deals on the live MT5 account (`213878432`).
+  - Winning trades distribution: Mean confidence **55.07%**, Median **56.0%**, Interquartile **50.0% – 60.0%**.
+  - 82.7% of all winning executions occurred at confidence $\ge 50\%$.
+- **Gate Recalibration** in `mt5_live_trader.py`:
+  - **M15 Cycle Engine** (`778899`): Raised gate from 0.43 to **0.50**.
+  - **M5 High-Win-Rate Engine** (`778855`): Raised gate from 0.55 to **0.58**.
+  - **M1 Sniper Engine** (`778811`): Raised gate from 0.55 to **0.60**.
+- **Pending Order Book Scrub**: Automatically purged 10 low-confidence pending orders (`M15_CONF_44` to `M15_CONF_49`), retaining only high-confidence limit orders ($\ge 50\%$).
+
+### 2. M5 High-Win-Rate Liquidity Engine (1:2.6 R:R)
+- **Dataset**: `build_m5_hwr_dataset.py` (34,923 M5 bars, July 2025 – October 2026).
+  - Modeled with strict $0.35 spread friction.
+  - Requires asymmetric targets: $4.00+ reward, $1.50–$3.50 risk.
+- **Model Checkpoint**: `best_m5_hwr_net.pt` (Temporal Dilated ConvNet + Multi-Head Output).
+- **Out-of-Sample Forward Backtest** (6,955 unseen bars):
+  - Gate 0.55: 305 trades, 41.97% WR, 1.77 PF, +117.20% net return.
+  - Gate 0.60: 129 trades, 48.06% WR, 2.36 PF, 6.93% Max DD.
+  - Gate 0.65: 17 trades, 76.47% WR, 8.64 PF, 0.99% Max DD.
+- Deployed in live trader as Strategy 2 (`Magic 778855`).
+
+### 3. M1 V3 Direction-Aware & Reinforcement Sniper
+- **Checkpoint**: `best_m1_v3_rl_directional_net.pt`.
+- Features 180 M1 micro bars + 12 macro features including H4 macro trend slope.
+- **Hard Macro Direction Lock**:
+  - H4 Trend Slope $< -0.50$ locks out all `BUY_LIMIT` orders.
+  - H4 Trend Slope $> +0.50$ locks out all `SELL_LIMIT` orders.
+  - Protects equity against multi-dollar waterfall trends.
+
+---
+
 ## [v2.1.0] - 2026-10-21: Multi-Engine Scalper & Execution Overhaul
 
 ### 1. Dedicated M5 Continuous Scalper Model
