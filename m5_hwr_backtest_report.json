@@ -1,0 +1,72 @@
+{
+  "conf_45": {
+    "confidence_gate": 0.45,
+    "total_filled_trades": 590,
+    "expired_unfilled": 829,
+    "wins": 227,
+    "losses": 363,
+    "win_rate": 38.47,
+    "gross_profit": 57800.86,
+    "gross_loss": 37626.91,
+    "profit_factor": 1.54,
+    "net_return_pct": 201.74,
+    "final_balance": 30173.95,
+    "max_drawdown_pct": 22.95
+  },
+  "conf_50": {
+    "confidence_gate": 0.5,
+    "total_filled_trades": 451,
+    "expired_unfilled": 616,
+    "wins": 180,
+    "losses": 271,
+    "win_rate": 39.91,
+    "gross_profit": 42266.98,
+    "gross_loss": 25985.84,
+    "profit_factor": 1.63,
+    "net_return_pct": 162.81,
+    "final_balance": 26281.14,
+    "max_drawdown_pct": 16.04
+  },
+  "conf_55": {
+    "confidence_gate": 0.55,
+    "total_filled_trades": 305,
+    "expired_unfilled": 367,
+    "wins": 128,
+    "losses": 177,
+    "win_rate": 41.97,
+    "gross_profit": 26844.65,
+    "gross_loss": 15125.05,
+    "profit_factor": 1.77,
+    "net_return_pct": 117.2,
+    "final_balance": 21719.6,
+    "max_drawdown_pct": 15.39
+  },
+  "conf_60": {
+    "confidence_gate": 0.6,
+    "total_filled_trades": 129,
+    "expired_unfilled": 166,
+    "wins": 62,
+    "losses": 67,
+    "win_rate": 48.06,
+    "gross_profit": 10535.47,
+    "gross_loss": 4457.59,
+    "profit_factor": 2.36,
+    "net_return_pct": 60.78,
+    "final_balance": 16077.88,
+    "max_drawdown_pct": 6.93
+  },
+  "conf_65": {
+    "confidence_gate": 0.65,
+    "total_filled_trades": 17,
+    "expired_unfilled": 25,
+    "wins": 13,
+    "losses": 4,
+    "win_rate": 76.47,
+    "gross_profit": 1844.97,
+    "gross_loss": 213.65,
+    "profit_factor": 8.64,
+    "net_return_pct": 16.31,
+    "final_balance": 11631.32,
+    "max_drawdown_pct": 0.99
+  }
+}
