@@ -1,0 +1,12 @@
+{
+  "threshold": 0.55,
+  "trades": 2296,
+  "wins": 430,
+  "losses": 1866,
+  "win_rate_pct": 18.73,
+  "profit_factor": 0.6000000238418579,
+  "gross_profit": 3612.0,
+  "gross_loss": 5971.2,
+  "net_pnl": -2359.199951171875,
+  "max_drawdown": 2370.75
+}
