@@ -1,0 +1,47 @@
+{
+  "gate_0.4": {
+    "filled": 220,
+    "wins": 77,
+    "losses": 143,
+    "win_rate": 35.0,
+    "profit_factor": 1.05,
+    "net_return_pct": 1.38,
+    "max_dd_pct": 6.75
+  },
+  "gate_0.45": {
+    "filled": 220,
+    "wins": 77,
+    "losses": 143,
+    "win_rate": 35.0,
+    "profit_factor": 1.05,
+    "net_return_pct": 1.38,
+    "max_dd_pct": 6.75
+  },
+  "gate_0.5": {
+    "filled": 220,
+    "wins": 77,
+    "losses": 143,
+    "win_rate": 35.0,
+    "profit_factor": 1.05,
+    "net_return_pct": 1.38,
+    "max_dd_pct": 6.75
+  },
+  "gate_0.55": {
+    "filled": 186,
+    "wins": 63,
+    "losses": 123,
+    "win_rate": 33.87,
+    "profit_factor": 0.99,
+    "net_return_pct": -0.15,
+    "max_dd_pct": 8.43
+  },
+  "gate_0.6": {
+    "filled": 148,
+    "wins": 54,
+    "losses": 94,
+    "win_rate": 36.49,
+    "profit_factor": 1.12,
+    "net_return_pct": 2.3,
+    "max_dd_pct": 6.24
+  }
+}
