@@ -1,12 +1,17 @@
 # Git ignore for MT5 AI Trader
 # Exclude large data files, runtime logs, and staging caches
-# Exclude large runtime logs and temporary caches
 *.log
 *.zip
+*.npz
 sample_preview.json
+*_preview.json
 __pycache__/
 *.pyc
 
 # Keep models and code
 !best_order_net.pt
 !v1_archive/*.pt
+!best_m5_hwr_net.pt
+!best_m1_v3_rl_directional_net.pt
+!best_xauusd_unified_patchtst.onnx
+!best_m5_mean_reversion_v2_net.onnx
